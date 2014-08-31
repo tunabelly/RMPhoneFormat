@@ -606,7 +606,7 @@ static NSMutableDictionary *flagRules = nil;
 }
 
 + (void)initialize {
-    phoneChars = [NSCharacterSet characterSetWithCharactersInString:@"0123456789+*#"];
+    phoneChars = [NSCharacterSet characterSetWithCharactersInString:@"0123456789+*#,"];
     
 #ifdef DEBUG
     extra1CallingCodes = [[NSMutableDictionary alloc] init];
