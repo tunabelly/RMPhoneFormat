@@ -696,7 +696,14 @@ static NSMutableDictionary *flagRules = nil;
     return res;
 }
 
-- (NSString *)format:(NSString *)orig {
+- (NSString *)format:(NSString *)orig
+{
+	// check
+	if (orig == nil)
+	{
+		return nil;
+	}
+	
     // First remove all added punctuation to get just raw phone number characters.
     NSString *str = [RMPhoneFormat strip:orig];
 
@@ -764,6 +771,8 @@ static NSMutableDictionary *flagRules = nil;
 }
 
 - (BOOL)isPhoneNumberValid:(NSString *)phoneNumber {
+	const NSUInteger kSpecialCaseLength = 12;
+	
     // First remove all added punctuation to get just raw phone number characters.
     NSString *str = [RMPhoneFormat strip:phoneNumber];
     
@@ -781,7 +790,18 @@ static NSMutableDictionary *flagRules = nil;
         if (info) {
             // We found a matching country. Use that info to see if the number is complete.
             BOOL valid = [info isValidPhoneNumber:rest];
-            
+			
+			if ((valid == NO) && (rest.length > kSpecialCaseLength)) {
+				// special case where the number is more than 12 digits with an international prefix
+				// and proper country code (this can happen for example with German numbers with
+				// the format +## #### #######
+				NSCharacterSet* notDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+				if ([rest rangeOfCharacterFromSet:notDigits].location == NSNotFound) {
+					// the phone number is all digits
+					valid = YES;
+				}
+			}
+			
             return valid;
         } else {
             // No matching country code
